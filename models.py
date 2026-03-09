@@ -22,6 +22,7 @@ class User(db.Model, SerializerMixin):
     created_at=db.Column(db.DateTime, default=datetime.utcnow)
     
     mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete_orphan")
+    garages=db.relationship('Garage', back_populates='owner',cascade='all,delete_orphan')
     
 
 class Mechanic(db.Model, SerializerMixin):
@@ -33,9 +34,11 @@ class Mechanic(db.Model, SerializerMixin):
     rating=db.Column(db.Float,default=0)
     
     user_id=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    garage_id=db.Column(db.Integer, db.ForeignKey('garages.id'),)
     
     user=db.relationship('User', back_populates='mechanic')
     services=db.relationship('Service', back_populates='mechanic',cascade="all, delete_orphan")
+    garage=db.relationship('Garage',back_populates='mechanics')
     
 class Service(db.Model, SerializerMixin):
     __tablename__='services'
@@ -46,5 +49,25 @@ class Service(db.Model, SerializerMixin):
     price=db.Column(db.Integer)
     
     mechanic_id=db.Column(db.Integer, db.ForeignKey('mechanics.id'))
+    garage_id=db.Column(db.Integer, db.ForeignKey('garages.id'))
     
     mechanic=db.relationship('Mechanic', back_populates='services')
+    garage=db.relationship('Garage', back_populates='services')
+    
+    
+
+class Garage(db.Model,SerializerMixin):
+    
+    __tablename__='garages'
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String, nullable=False)
+    location=db.Column(db.String, nullable=False)
+    rating=db.Column(db.Float, default=0)
+    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    
+    owner_id=db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    owner=db.relationship('User', back_populates='garages')
+    mechanics=db.relationship('Mechanic', back_populates='garage')
+    services=db.relationship('Service', back_populates='garage', cascade='all, delete_orphan')
+    
