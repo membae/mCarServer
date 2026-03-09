@@ -71,7 +71,7 @@ class Garage(db.Model,SerializerMixin):
     owner_id=db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     
     owner=db.relationship('User', back_populates='garages')
-    mechanics=db.relationship('Mechanic', back_populates='garage')
+    mechanics=db.relationship('Mechanic', back_populates='garage', cascade='all, delete-orphan')
     services=db.relationship('Service', back_populates='garage', cascade='all, delete-orphan')
     spareparts=db.relationship('Sparepart', back_populates='garage', cascade='all, delete-orphan')
     reviews=db.relationship('Review', back_populates='garage', cascade='all, delete-orphan')
@@ -97,6 +97,7 @@ class Car(db.Model,SerializerMixin):
     
     owner_id=db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     owner=db.relationship('User', back_populates='cars')
+    images=db.relationship('CarImage', back_populates='car', cascade='all, delete-orphan')
     
 
 class Sparepart(db.Model, SerializerMixin):
@@ -133,4 +134,16 @@ class Review(db.Model,SerializerMixin):
     
     user=db.relationship('User', back_populates='reviews')
     garage=db.relationship('Garage', back_populates='reviews')
+    
+    
+    
+class CarImage(db.Model, SerializerMixin):
+    __tablename__='carimages'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    image_url=db.Column(db.String, nullable=False)
+    car_id=db.Column(db.Integer, db.ForeignKey('cars.id'), nullable=False)
+    
+    car=db.relationship('Car', back_populates='images')
+    
     
