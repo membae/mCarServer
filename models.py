@@ -23,6 +23,7 @@ class User(db.Model, SerializerMixin):
     
     mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete_orphan")
     garages=db.relationship('Garage', back_populates='owner',cascade='all,delete_orphan')
+    cars=db.relationship('Car', back_populates='owner', cascade='all, delete-orphan')
     
 
 class Mechanic(db.Model, SerializerMixin):
@@ -70,4 +71,25 @@ class Garage(db.Model,SerializerMixin):
     owner=db.relationship('User', back_populates='garages')
     mechanics=db.relationship('Mechanic', back_populates='garage')
     services=db.relationship('Service', back_populates='garage', cascade='all, delete_orphan')
+  
+  
+class Car(db.Model,SerializerMixin):
+    __tablename__='cars'
     
+    id=db.Column(db.Integer, primary_key=True)
+    make=db.Column(db.String,nullable=False)
+    model=db.Column(db.String)
+    year_of_manufacture=db.Column(db.Integer)
+    color=db.Column(db.String)
+    engine_capacity=db.Column(db.Float)
+    fuel_type=db.Column(db.String)
+    transmission=db.Column(db.String)
+    mileage=db.Column(db.Integer)
+    registration_number=db.Column(db.String, unique=True)
+    price=db.Column(db.Float)
+    description=db.Column(db.Text)
+    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    location=db.Column(db.String)
+    
+    owner_id=db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner=db.relationship('User', back_populates='cars')
