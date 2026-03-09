@@ -24,6 +24,7 @@ class User(db.Model, SerializerMixin):
     mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete_orphan")
     garages=db.relationship('Garage', back_populates='owner',cascade='all,delete_orphan')
     cars=db.relationship('Car', back_populates='owner', cascade='all, delete-orphan')
+    spareparts=db.relationship('Sparepart', back_populates='seller', cascade='all, delete-orphan')
     
 
 class Mechanic(db.Model, SerializerMixin):
@@ -31,7 +32,7 @@ class Mechanic(db.Model, SerializerMixin):
     
     id=db.Column(db.Integer, primary_key=True)
     specialization=db.Column(db.String)
-    hourly_rate=db.Column(db.Integer)
+    hourly_rate=db.Column(db.Float)
     rating=db.Column(db.Float,default=0)
     
     user_id=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -47,7 +48,7 @@ class Service(db.Model, SerializerMixin):
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String, nullable=False)
     description=db.Column(db.Text)
-    price=db.Column(db.Integer)
+    price=db.Column(db.Float)
     
     mechanic_id=db.Column(db.Integer, db.ForeignKey('mechanics.id'))
     garage_id=db.Column(db.Integer, db.ForeignKey('garages.id'))
@@ -71,6 +72,7 @@ class Garage(db.Model,SerializerMixin):
     owner=db.relationship('User', back_populates='garages')
     mechanics=db.relationship('Mechanic', back_populates='garage')
     services=db.relationship('Service', back_populates='garage', cascade='all, delete_orphan')
+    spareparts=db.relationship('Sparepart', back_populates='garage', cascade='all, delete_orphan')
   
   
 class Car(db.Model,SerializerMixin):
@@ -93,3 +95,23 @@ class Car(db.Model,SerializerMixin):
     
     owner_id=db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     owner=db.relationship('User', back_populates='cars')
+    
+
+class Sparepart(db.Model, SerializerMixin):
+    __tablename__='spareparts'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String, nullable=False)
+    description=db.Column(db.Text)
+    part_number=db.Column(db.String, unique=True)
+    brand=db.Column(db.String)
+    condition=db.Column(db.String, default='New')
+    price=db.Column(db.Float, nullable=False)
+    quantity=db.Column(db.Integer, nullable=False)
+    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    
+    seller_id=db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
+    garage_id=db.Column(db.Integer,db.ForeignKey('garages.id'))
+    
+    seller=db.relationship('User', back_populates='spareparts')
+    garage=db.relationship('Garage', back_populates='spareparts')
