@@ -118,6 +118,7 @@ class Sparepart(db.Model, SerializerMixin):
     
     seller=db.relationship('User', back_populates='spareparts')
     garage=db.relationship('Garage', back_populates='spareparts')
+    images=db.relationship('Spareimage', back_populates='sparepart', cascade='all,delete-orphan')
     
     
 
@@ -147,3 +148,12 @@ class CarImage(db.Model, SerializerMixin):
     car=db.relationship('Car', back_populates='images')
     
     
+
+class SpareImage(db.Model, SerializerMixin):
+    __tablename__='spareimages'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    image_url=db.Column(db.String, nullable=False)
+    sparepart_id=db.Column(db.Integer, db.ForeignKey('spareparts.id'), nullable=False)
+    
+    sparepart=db.relationship('Sparepart', back_populates='images')
