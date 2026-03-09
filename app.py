@@ -41,6 +41,28 @@ class Home(Resource):
 
 api.add_resource(Home,'/')
 
+class Signup(Resource):
+    def post(self):
+        data=request.get_json()
+        email=data.get("email")
+        first_name=data.get("first_name")
+        last_name=data.get("last_name")
+        created_at=datetime.datetime.now()
+        password=generate_password_hash(data.get("password"))
+        phone=data.get("phone")
+        role=data.get("role")
+        location=data.get('location')
+        if "@" in email and first_name and first_name!=" " and last_name and last_name!=" "and phone and phone!=" " and location and location!=" " and role and role!=" " and data.get("password") and data.get("password")!=" ":
+            user=User.query.filter_by(email=email).first()
+            if user:
+                return make_response({"msg":f"{email} is already registered"},400)
+            new_user=User(first_name=first_name,last_name=last_name,email=email,phone=phone,location=location,password=password,created_at=created_at,role=role)
+            db.session.add(new_user)
+            db.session.commit()
+            return make_response(new_user.to_dict(),201)
+        return make_response({"msg":"Invalid data entries"},400)
+api.add_resource(Signup,'/signup')
+
 
 if __name__=="__main__":
     app.run(debug=True)

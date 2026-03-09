@@ -118,7 +118,7 @@ class Sparepart(db.Model, SerializerMixin):
     
     seller=db.relationship('User', back_populates='spareparts')
     garage=db.relationship('Garage', back_populates='spareparts')
-    images=db.relationship('Spareimage', back_populates='sparepart', cascade='all,delete-orphan')
+    images=db.relationship('SpareImage', back_populates='sparepart', cascade='all,delete-orphan')
     
     
 
