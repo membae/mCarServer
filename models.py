@@ -21,10 +21,11 @@ class User(db.Model, SerializerMixin):
     is_verified=db.Column(db.Boolean, default=False)
     created_at=db.Column(db.DateTime, default=datetime.utcnow)
     
-    mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete_orphan")
-    garages=db.relationship('Garage', back_populates='owner',cascade='all,delete_orphan')
+    mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete-orphan")
+    garages=db.relationship('Garage', back_populates='owner',cascade='all,delete-orphan')
     cars=db.relationship('Car', back_populates='owner', cascade='all, delete-orphan')
     spareparts=db.relationship('Sparepart', back_populates='seller', cascade='all, delete-orphan')
+    reviews=db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
     
 
 class Mechanic(db.Model, SerializerMixin):
@@ -39,7 +40,7 @@ class Mechanic(db.Model, SerializerMixin):
     garage_id=db.Column(db.Integer, db.ForeignKey('garages.id'),)
     
     user=db.relationship('User', back_populates='mechanic')
-    services=db.relationship('Service', back_populates='mechanic',cascade="all, delete_orphan")
+    services=db.relationship('Service', back_populates='mechanic',cascade="all, delete-orphan")
     garage=db.relationship('Garage',back_populates='mechanics')
     
 class Service(db.Model, SerializerMixin):
@@ -71,8 +72,9 @@ class Garage(db.Model,SerializerMixin):
     
     owner=db.relationship('User', back_populates='garages')
     mechanics=db.relationship('Mechanic', back_populates='garage')
-    services=db.relationship('Service', back_populates='garage', cascade='all, delete_orphan')
-    spareparts=db.relationship('Sparepart', back_populates='garage', cascade='all, delete_orphan')
+    services=db.relationship('Service', back_populates='garage', cascade='all, delete-orphan')
+    spareparts=db.relationship('Sparepart', back_populates='garage', cascade='all, delete-orphan')
+    reviews=db.relationship('Review', back_populates='garage', cascade='all, delete-orphan')
   
   
 class Car(db.Model,SerializerMixin):
@@ -115,3 +117,20 @@ class Sparepart(db.Model, SerializerMixin):
     
     seller=db.relationship('User', back_populates='spareparts')
     garage=db.relationship('Garage', back_populates='spareparts')
+    
+    
+
+class Review(db.Model,SerializerMixin):
+    __tablename__='reviews'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    rating=db.Column(db.Integer, nullable=False)
+    comment=db.Column(db.Text)
+    created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user_id=db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
+    garage_id=db.Column(db.Integer, db.ForeignKey('garages.id'))
+    
+    user=db.relationship('User', back_populates='reviews')
+    garage=db.relationship('Garage', back_populates='reviews')
+    
