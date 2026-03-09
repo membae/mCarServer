@@ -21,7 +21,7 @@ class User(db.Model, SerializerMixin):
     is_verified=db.Column(db.Boolean, default=False)
     created_at=db.Column(db.DateTime, default=datetime.utcnow)
     
-    mechanics=db.relationship('Mechanic', back_populates='user')
+    mechanic=db.relationship('Mechanic', back_populates='user', cascade="all, delete_orphan")
     
 
 class Mechanic(db.Model, SerializerMixin):
@@ -34,4 +34,17 @@ class Mechanic(db.Model, SerializerMixin):
     
     user_id=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     
-    user=db.relationship('User', back_populates='mechanics')
+    user=db.relationship('User', back_populates='mechanic')
+    services=db.relationship('Service', back_populates='mechanic',cascade="all, delete_orphan")
+    
+class Service(db.Model, SerializerMixin):
+    __tablename__='services'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String, nullable=False)
+    description=db.Column(db.Text)
+    price=db.Column(db.Integer)
+    
+    mechanic_id=db.Column(db.Integer, db.ForeignKey('mechanics.id'))
+    
+    mechanic=db.relationship('Mechanic', back_populates='services')
