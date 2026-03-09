@@ -20,3 +20,18 @@ class User(db.Model, SerializerMixin):
     location=db.Column(db.String, default='Nairobi')
     is_verified=db.Column(db.Boolean, default=False)
     created_at=db.Column(db.DateTime, default=datetime.utcnow)
+    
+    mechanics=db.relationship('Mechanic', back_populates='user')
+    
+
+class Mechanic(db.Model, SerializerMixin):
+    __tablename__='mechanics'
+    
+    id=db.Column(db.Integer, primary_key=True)
+    specialization=db.Column(db.String)
+    hourly_rate=db.Column(db.Integer)
+    rating=db.Column(db.Float,default=0)
+    
+    user_id=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    
+    user=db.relationship('User', back_populates='mechanics')
