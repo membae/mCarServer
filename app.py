@@ -63,6 +63,23 @@ class Signup(Resource):
         return make_response({"msg":"Invalid data entries"},400)
 api.add_resource(Signup,'/signup')
 
+class Login(Resource):
+    def post(self):
+        data=request.get_json()
+        email=data.get("email")
+        password=data.get("password")
+        if "@" in email and password:
+            user=User.query.filter_by(email=email).first()
+            if user:
+                if check_password_hash(user.password,password):
+                    access_token=create_access_token(identity=user.id)
+                    refresh_token=create_refresh_token(identity=user.id)
+                    return make_response({"user":user.to_dict(),"access_token":access_token,"refresh_token":refresh_token},200)
+                return make_response({"msg":"Incorrect password"},400)
+            return make_response({"msg":"email not registered"},404)
+        return make_response({"msg":"Invalid data"})
+api.add_resource(Login,'/login')
+
 
 if __name__=="__main__":
     app.run(debug=True)
