@@ -172,6 +172,37 @@ class Mechanic_by_id(Resource):
         return make_response({"msg":"No such mechanic found"},404)
 api.add_resource(Mechanic_by_id,'/mechanic/<int:id>')
 
+class Get_services(Resource):
+    def get(self):
+        services=Service.query.all()
+        if services:
+            return make_response([service.to_dict() for service in services],200)
+        return make_response({"msg":"No services available"})
+    
+    def post(self):
+        data=request.get_json()
+        name=data.get("name")
+        description=data.get("description")
+        price=data.get("price")
+        mechanic_id=data.get("mechanic_id")
+        garage_id=data.get("garage_id")
+        
+        if mechanic_id:
+            mechanic=Mechanic.query.get(mechanic_id)
+            if not mechanic:
+                return make_response({"msg":"Mechanic entered not found"})
+        if garage_id:
+            garage=Garage.query.get(garage_id)
+            if not garage:
+                return make_response({"msg":"Garage entered not found"})
+        if not mechanic and not garage:
+            return make_response({"msg":"A service must belong to either a garage or a mechanic"})
+        service=Service(name=name, description=description, price=price, mechanic_id=mechanic_id, garage_id=garage_id)
+        db.session.add(service)
+        db.session.commit()
+        return make_response(service.to_dict(),201)
+api.add_resource(Get_services,'/services')
+
 
 if __name__=="__main__":
     app.run(debug=True)

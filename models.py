@@ -61,6 +61,8 @@ class Service(db.Model, SerializerMixin):
     mechanic=db.relationship('Mechanic', back_populates='services')
     garage=db.relationship('Garage', back_populates='services')
     
+    serialize_rules=('-mechanic.services',)
+    
     
 
 class Garage(db.Model,SerializerMixin):
