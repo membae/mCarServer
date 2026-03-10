@@ -80,6 +80,15 @@ class Login(Resource):
         return make_response({"msg":"Invalid data"})
 api.add_resource(Login,'/login')
 
+class GetUsers(Resource):
+    def get(self):
+        users=User.query.all()
+        if users:
+            return make_response([user.to_dict() for user in users],200)
+        return make_response({"msg","No user found"})
+    
+api.add_resource(GetUsers,'/users')
+
 
 if __name__=="__main__":
     app.run(debug=True)
