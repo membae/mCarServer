@@ -203,6 +203,34 @@ class Get_services(Resource):
         return make_response(service.to_dict(),201)
 api.add_resource(Get_services,'/services')
 
+class Service_by_id(Resource):
+    def get(self,id):
+        service=Service.query.filter_by(id=id).first()
+        if service:
+            return make_response(service.to_dict(),200)
+        return make_response({"msg":"Service does not exist"},404)
+    
+    def patch(self,id):
+        service=Service.query.filter_by(id=id).first()
+        if service:
+            data=request.get_json()
+            for attr in data:
+                if attr in['name','description','price','garage_id','mechanic_id']:
+                    setattr(service,attr,data.get(attr))
+            db.session.add(service)
+            db.session.commit()
+            return make_response(service.to_dict(),201)
+        return make_response({"msg":"Service does not exist"},404)
+    
+    def delete(self,id):
+        service=Service.query.filter_by(id=id).first()
+        if service:
+            db.session.delete(service)
+            db.session.commit()
+            return make_response({"msg":"Service deleted succesfully"},200)
+        return make_response({"msg":"Service does not exist"},404)
+api.add_resource(Service_by_id,'/service/<int:id>')
+
 
 if __name__=="__main__":
     app.run(debug=True)
