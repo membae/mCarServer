@@ -144,6 +144,34 @@ class Mechanics(Resource):
     
 api.add_resource(Mechanics,'/mechanics')
 
+class Mechanic_by_id(Resource):
+    def get(self,id):
+        mechanic=Mechanic.query.filter_by(id=id).first()
+        if mechanic:
+            return make_response(mechanic.to_dict(),200)
+        return make_response({"msg":"Mechanic entered not Found"}) 
+    
+    def patch(self,id):
+        mechanic=Mechanic.query.filter_by(id=id).first()
+        if mechanic:
+            data=request.get_json()
+            for attr in data:
+                if attr in['specialization','hourly_rate','rating','user_id','garage_id']:
+                    setattr(mechanic,attr,data.get(attr))
+            db.session.add(mechanic)
+            db.session.commit()
+            return make_response(mechanic.to_dict(),200)
+        return make_response({"msg":"mechanic does not exist"},404)
+    
+    def delete(self,id):
+        mechanic=Mechanic.query.filter_by(id=id).first()
+        if mechanic:
+            db.session.delete(mechanic)
+            db.session.commit()
+            return make_response({"msg":"Mechanic deleted successfully"},200)
+        return make_response({"msg":"No such mechanic found"},404)
+api.add_resource(Mechanic_by_id,'/mechanic/<int:id>')
+
 
 if __name__=="__main__":
     app.run(debug=True)
