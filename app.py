@@ -89,6 +89,37 @@ class GetUsers(Resource):
     
 api.add_resource(GetUsers,'/users')
 
+class User_by_id(Resource):
+    def get(self,id):
+        user=User.query.filter_by(id=id).first()
+        if user:
+            return make_response(user.to_dict(),200)
+        return make_response({"msg":"User does not exist"},404)
+    
+    def patch(self,id):
+        user=User.query.filter_by(id=id).first()
+        if user:
+            data=request.get_json()
+            for attr in data:
+                if attr in ['first_name','last_name','email','phone','role','location','is_verified']:
+                    setattr(user,attr,data.get(attr))
+                if "password" in data:
+                    user.password=generate_password_hash(data['password'])
+            db.session.add(user)
+            db.session.commit()
+            return make_response(user.to_dict(),200)
+        return make_response({"msg":"user not found"})
+    
+    def delete(self,id):
+        user=User.query.filter_by(id=id).first()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            return make_response({"msg":"user deleted successfully"})
+        return make_response({"msg":"user not found"})
+    
+api.add_resource(User_by_id,'/user/<int:id>')
+
 
 if __name__=="__main__":
     app.run(debug=True)
