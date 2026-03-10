@@ -120,6 +120,30 @@ class User_by_id(Resource):
     
 api.add_resource(User_by_id,'/user/<int:id>')
 
+class Mechanics(Resource):
+    def get(self):
+        mechanics=Mechanic.query.all()
+        if mechanics:
+            return make_response([mechanic.to_dict() for mechanic in mechanics],200)
+        return make_response({'msg':"no mechanics found"})
+    
+    def post(self):
+        data=request.get_json()
+        user_id=data.get('user_id')
+        specialization=data.get('specialization')
+        hourly_rate=data.get("hourly_rate")
+        garage_id=data.get("garage_id")
+        
+        user=User.query.get(user_id)
+        if not user:
+            return make_response({"msg":"A mechanic must be a registered user"})
+        mechanic=Mechanic(specialization=specialization,hourly_rate=hourly_rate,garage_id=garage_id,user_id=user_id)
+        db.session.add(mechanic)
+        db.session.commit()
+        return make_response(mechanic.to_dict(),201)
+    
+api.add_resource(Mechanics,'/mechanics')
+
 
 if __name__=="__main__":
     app.run(debug=True)

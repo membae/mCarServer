@@ -27,6 +27,8 @@ class User(db.Model, SerializerMixin):
     spareparts=db.relationship('Sparepart', back_populates='seller', cascade='all, delete-orphan')
     reviews=db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
     
+    serialize_rules=('-mechanic.user',)
+    
 
 class Mechanic(db.Model, SerializerMixin):
     __tablename__='mechanics'
@@ -42,6 +44,8 @@ class Mechanic(db.Model, SerializerMixin):
     user=db.relationship('User', back_populates='mechanic')
     services=db.relationship('Service', back_populates='mechanic',cascade="all, delete-orphan")
     garage=db.relationship('Garage',back_populates='mechanics')
+    
+    serialize_rules=('-user.mechanic',)
     
 class Service(db.Model, SerializerMixin):
     __tablename__='services'
