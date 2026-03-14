@@ -231,6 +231,28 @@ class Service_by_id(Resource):
         return make_response({"msg":"Service does not exist"},404)
 api.add_resource(Service_by_id,'/service/<int:id>')
 
+class Get_garages(Resource):
+    def get(self):
+        garages=Garage.query.all()
+        if garages:
+            return make_response([garage.to_dict() for garage in garages],200)
+        return make_response({"msg":"No garage Found"},404)
+    
+    def post(self):
+        data=request.get_json()
+        name=data.get('name')
+        location=data.get('location')
+        owner_id=data.get("owner_id")
+        
+        owner=User.query.get(owner_id)
+        if not owner:
+            return make_response({"msg":"Owner does not exist as a User"},404)
+        garage=Garage(name=name,location=location,owner_id=owner_id)
+        db.session.add(garage)
+        db.session.commit()
+        return make_response(garage.to_dict(),201)
+api.add_resource(Get_garages,'/garages')
+
 
 if __name__=="__main__":
     app.run(debug=True)

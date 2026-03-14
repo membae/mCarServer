@@ -27,8 +27,8 @@ class User(db.Model, SerializerMixin):
     spareparts=db.relationship('Sparepart', back_populates='seller', cascade='all, delete-orphan')
     reviews=db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
     
-    serialize_rules=('-mechanic.user',)
-    
+    # serialize_rules=('-mechanic.user','-garages.owner','-cars.owner','-spareparts.seller','-reviews.user')
+    serialize_only =('id','first_name','last_name','email','phone','password','role','location','is_verified','created_at')
 
 class Mechanic(db.Model, SerializerMixin):
     __tablename__='mechanics'
@@ -45,8 +45,8 @@ class Mechanic(db.Model, SerializerMixin):
     services=db.relationship('Service', back_populates='mechanic',cascade="all, delete-orphan")
     garage=db.relationship('Garage',back_populates='mechanics')
     
-    serialize_rules=('-user.mechanic',)
-    
+    #serialize_rules=('-user.mechanic','-services.mechanic','-garage.mechanics')
+    serialize_only =('id','specialization','hourly_rate','rating')
 class Service(db.Model, SerializerMixin):
     __tablename__='services'
     
@@ -61,8 +61,8 @@ class Service(db.Model, SerializerMixin):
     mechanic=db.relationship('Mechanic', back_populates='services')
     garage=db.relationship('Garage', back_populates='services')
     
-    serialize_rules=('-mechanic.services',)
-    
+    #serialize_rules=('-mechanic.services','-garage.services')
+    serialize_only =('id','name','description','price')
     
 
 class Garage(db.Model,SerializerMixin):
@@ -81,7 +81,9 @@ class Garage(db.Model,SerializerMixin):
     services=db.relationship('Service', back_populates='garage', cascade='all, delete-orphan')
     spareparts=db.relationship('Sparepart', back_populates='garage', cascade='all, delete-orphan')
     reviews=db.relationship('Review', back_populates='garage', cascade='all, delete-orphan')
-  
+    
+    #serialize_rules=('-owner.garages','-mechanics.garage','-services.garage','-spareparts.garage','-reviews.garage')
+    serialize_only =('id','name','location','rating','created_at')
   
 class Car(db.Model,SerializerMixin):
     __tablename__='cars'
@@ -105,6 +107,8 @@ class Car(db.Model,SerializerMixin):
     owner=db.relationship('User', back_populates='cars')
     images=db.relationship('CarImage', back_populates='car', cascade='all, delete-orphan')
     
+    #serialize_rules=('-owner.cars','-images.car')
+    serialize_only =('id','make','model','year_of_manufacture','color','engine_capacity','fuel_type','transmission','mileage','registration_number','price','description','created_at','location')
 
 class Sparepart(db.Model, SerializerMixin):
     __tablename__='spareparts'
@@ -126,6 +130,9 @@ class Sparepart(db.Model, SerializerMixin):
     garage=db.relationship('Garage', back_populates='spareparts')
     images=db.relationship('SpareImage', back_populates='sparepart', cascade='all,delete-orphan')
     
+    #serialize_rules=('-seller.spareparts','-garage.spareparts','-images.sparepart')
+    serialize_only =('id','name','description','part_number','brand','condition','price','quantity','created_at')
+    
     
 
 class Review(db.Model,SerializerMixin):
@@ -142,6 +149,8 @@ class Review(db.Model,SerializerMixin):
     user=db.relationship('User', back_populates='reviews')
     garage=db.relationship('Garage', back_populates='reviews')
     
+    #serialize_rules=('-user.reviews','-garage.reviews')
+    serialize_only =('id','rating','comment','created_at')
     
     
 class CarImage(db.Model, SerializerMixin):
@@ -153,6 +162,8 @@ class CarImage(db.Model, SerializerMixin):
     
     car=db.relationship('Car', back_populates='images')
     
+    # serialize_rules=('-car.images',)
+    serialize_only =('id','image_url','car_id')
     
 
 class SpareImage(db.Model, SerializerMixin):
@@ -163,3 +174,6 @@ class SpareImage(db.Model, SerializerMixin):
     sparepart_id=db.Column(db.Integer, db.ForeignKey('spareparts.id'), nullable=False)
     
     sparepart=db.relationship('Sparepart', back_populates='images')
+    
+    #serialize_rules=('-sparepart.images',)
+    serialize_only =('id','image_url','sparepart_id')
