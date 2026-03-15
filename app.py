@@ -253,6 +253,18 @@ class Get_garages(Resource):
         return make_response(garage.to_dict(),201)
 api.add_resource(Get_garages,'/garages')
 
+class Garage_by_id(Resource):
+    def get(self,id):
+        garage=Garage.query.filter_by(id=id).first()
+        if garage:
+            return make_response(garage.to_dict(),200)
+        return make_response({"msg":"garage entered does not exist"},404)
+    
+    
+    
+    
+api.add_resource(Garage_by_id,'/garage/<int:id>')
+
 
 if __name__=="__main__":
     app.run(debug=True)
