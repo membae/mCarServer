@@ -384,12 +384,22 @@ class Get_spareparts(Resource):
                 return make_response({"msg":"Garage entered does not exist"},404)
         if not seller and not garage:
             return make_response({"msg":"A sparepart must belong to either a seller or a garage"},409)
+        existing=Sparepart.query.filter_by(part_number=part_number).first()
+        if existing:
+            return make_response({"msg":"Sparepart with this part number already exist"},409)
         sparepart=Sparepart(name=name,description=description,part_number=part_number,brand=brand,condition=condition,price=price,quantity=quantity,seller_id=seller_id,garage_id=garage_id)
         db.session.add(sparepart)
         db.session.commit()
         return make_response(sparepart.to_dict(),201)
 api.add_resource(Get_spareparts,'/spareparts')
 
+class Sparepart_by_id(Resource):
+    def get(self,id):
+        sparepart=Sparepart.query.filter_by(id=id).first()
+        if sparepart:
+            return make_response(sparepart.to_dict(),200)
+        return make_response({"msg":"sparepart entered does not exist"},404)
+api.add_resource(Sparepart_by_id,'/sparepart/<int:id>')
 
 if __name__=="__main__":
     app.run(debug=True)
