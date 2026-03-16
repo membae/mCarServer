@@ -272,6 +272,13 @@ class Garage_by_id(Resource):
             return make_response(garage.to_dict(),200)
         return make_response({"msg":"Garage entered does not exist"},404)
     
+    def delete(self,id):
+        garage=Garage.query.filter_by(id=id).first()
+        if garage:
+            db.session.delete(garage)
+            db.session.commit()
+            return make_response({"msg":"Garage deleted successfully"},200)
+        return make_response({"msg":"Garage does not exist"},404)   
             
     
     
