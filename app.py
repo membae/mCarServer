@@ -319,6 +319,39 @@ class Get_cars(Resource):
     
 api.add_resource(Get_cars,'/cars')
 
+class Car_by_id(Resource):
+    def get(self,id):
+        car=Car.query.filter_by(id=id).first()
+        if car:
+            return make_response(car.to_dict(),200)
+        return make_response({"msg":"Car does not exist"},404)
+    
+    def patch(self,id):
+        car=Car.query.filter_by(id=id).first()
+        if car:
+            data=request.get_json()
+            if "registration_number" in data:
+                existing=Car.query.filter_by(registration_number=data['registration_number']).first()
+                if existing and existing.id !=id:
+                    return make_response({"msg":"Car with the registration number already exists"},409)
+            for attr in data:
+                if attr in['make','model','year_of_manufacture','color','engine_capacity','fuel_type','transmission','mileage','registration_number','price','description','location','owner_id']:
+                    setattr(car,attr,data.get(attr))
+            db.session.add(car)
+            db.session.commit()
+            return make_response(car.to_dict(),200)
+        return make_response({"msg":"Car does not exist"},404)
+    
+    def delete(self,id):
+        car=Car.query.filter_by(id=id).first()
+        if car:
+            db.session.delete(car)
+            db.session.commit()
+            return make_response({"msg":"Car deleted successfully"},200)
+        return make_response({"msg":"Car entered does not exist"},404)
+    
+api.add_resource(Car_by_id,'/car/<int:id>')
+
 
 if __name__=="__main__":
     app.run(debug=True)
