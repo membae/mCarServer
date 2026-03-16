@@ -260,6 +260,20 @@ class Garage_by_id(Resource):
             return make_response(garage.to_dict(),200)
         return make_response({"msg":"garage entered does not exist"},404)
     
+    def patch(self,id):
+        garage=Garage.query.filter_by(id=id).first()
+        if garage:
+            data=request.get_json()
+            for attr in data:
+                if attr in['name','location','rating','owner_id']:
+                    setattr(garage,attr,data.get(attr))
+            db.session.add(garage)
+            db.session.commit()
+            return make_response(garage.to_dict(),200)
+        return make_response({"msg":"Garage entered does not exist"},404)
+    
+            
+    
     
     
     
