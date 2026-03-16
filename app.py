@@ -352,6 +352,44 @@ class Car_by_id(Resource):
     
 api.add_resource(Car_by_id,'/car/<int:id>')
 
+class Get_spareparts(Resource):
+    def get(self):
+        spareparts=Sparepart.query.all()
+        if spareparts:
+            return make_response([sparepart.to_dict() for sparepart in spareparts],200)
+        return make_response({"msg":"No spareparts exists at the moment"},404)
+    
+    def post(self):
+        data=request.get_json()
+        name=data.get("name")
+        description=data.get('description')
+        part_number=data.get('part_number')
+        brand=data.get('brand')
+        condition=data.get('condition')
+        price=data.get('price')
+        quantity=data.get('quantity')
+        seller_id=data.get('seller_id')
+        garage_id=data.get("garage_id")
+        
+        seller=None
+        garage=None
+        
+        if seller_id:
+            seller=User.query.get(seller_id)
+            if not seller:
+                return make_response({"msg":"Seller must be a registered user"},404)
+        if garage_id:
+            garage=Garage.query.get(garage_id)
+            if not garage:
+                return make_response({"msg":"Garage entered does not exist"},404)
+        if not seller and not garage:
+            return make_response({"msg":"A sparepart must belong to either a seller or a garage"},409)
+        sparepart=Sparepart(name=name,description=description,part_number=part_number,brand=brand,condition=condition,price=price,quantity=quantity,seller_id=seller_id,garage_id=garage_id)
+        db.session.add(sparepart)
+        db.session.commit()
+        return make_response(sparepart.to_dict(),201)
+api.add_resource(Get_spareparts,'/spareparts')
+
 
 if __name__=="__main__":
     app.run(debug=True)
