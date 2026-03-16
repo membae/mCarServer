@@ -280,11 +280,17 @@ class Garage_by_id(Resource):
             return make_response({"msg":"Garage deleted successfully"},200)
         return make_response({"msg":"Garage does not exist"},404)   
             
-    
-    
-    
-    
 api.add_resource(Garage_by_id,'/garage/<int:id>')
+
+class Get_cars(Resource):
+    def get(self):
+        cars=Car.query.all()
+        if cars:
+            return make_response([car.to_dict() for car in cars],200)
+        return make_response({"msg":"No cars exist at the moment"},404)
+    
+    
+api.add_resource(Get_cars,'/cars')
 
 
 if __name__=="__main__":
