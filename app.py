@@ -289,6 +289,33 @@ class Get_cars(Resource):
             return make_response([car.to_dict() for car in cars],200)
         return make_response({"msg":"No cars exist at the moment"},404)
     
+    def post(self):
+        data=request.get_json()
+        make=data.get('make')
+        model=data.get('model')
+        year_of_manufacture=data.get('year_of_manufacture')
+        color=data.get('color')
+        engine_capacity=data.get('engine_capacity')
+        fuel_type=data.get('fuel_type')
+        transmission=data.get('transmission')
+        mileage=data.get("mileage")
+        price=data.get('price')
+        description=data.get('description')
+        location=data.get('location')
+        owner_id=data.get('owner_id')
+        registration_number=data.get('registration_number')
+        owner=User.query.get(owner_id)
+        if not owner:
+            return make_response({"msg":"Owner does not exist as a registered user"},404)
+        car=Car.query.filter_by(registration_number=registration_number).first()
+        if car:
+            return make_response({"msg":"Car entered already exist"},409)
+        new_car=Car(make=make,model=model,year_of_manufacture=year_of_manufacture,color=color, engine_capacity=engine_capacity,fuel_type=fuel_type,transmission=transmission,mileage=mileage,registration_number=registration_number,price=price,description=description,location=location,owner_id=owner_id)
+        db.session.add(new_car)
+        db.session.commit()
+        return make_response(new_car.to_dict(),201)
+    
+        
     
 api.add_resource(Get_cars,'/cars')
 
