@@ -425,5 +425,14 @@ class Sparepart_by_id(Resource):
         return make_response({"msg":"Sparepart entered does not exist"})        
 api.add_resource(Sparepart_by_id,'/sparepart/<int:id>')
 
+class Get_reviews(Resource):
+    def get(self):
+        reviews=Review.query.all()
+        if reviews:
+            return make_response([review.to_dict() for review in reviews],200)
+        return make_response({"msg":"No reviews at this time"},404)
+    
+api.add_resource(Get_reviews,'/reviews')
+
 if __name__=="__main__":
     app.run(debug=True)
