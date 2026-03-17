@@ -415,6 +415,14 @@ class Sparepart_by_id(Resource):
             db.session.commit()
             return make_response(sparepart.to_dict(),200)
         return make_response({"msg":"Sparepart entered does not exist"},404)
+    
+    def delete(self,id):
+        sparepart=Sparepart.query.filter_by(id=id).first()
+        if sparepart:
+            db.session.delete(sparepart)
+            db.session.commit()
+            return make_response({"msg":"Sparepart entered deleted successfully"},200)
+        return make_response({"msg":"Sparepart entered does not exist"})        
 api.add_resource(Sparepart_by_id,'/sparepart/<int:id>')
 
 if __name__=="__main__":
