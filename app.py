@@ -399,6 +399,22 @@ class Sparepart_by_id(Resource):
         if sparepart:
             return make_response(sparepart.to_dict(),200)
         return make_response({"msg":"sparepart entered does not exist"},404)
+    
+    def patch(self,id):
+        sparepart=Sparepart.query.filter_by(id=id).first()
+        if sparepart:
+            data=request.get_json()
+            if 'part_number' in data:
+                existing=Sparepart.query.filter_by(part_number=data['part_number']).first()
+                if existing and existing.id !=id:
+                    return make_response({"msg":"Sparepart with the entered sparepart number already exist"},409)
+            for attr in data:
+                if attr in['name','description','part_number','brand','condition','price','quantity','seller_id','garage_id']:
+                    setattr(sparepart,attr,data.get(attr))
+            db.session.add(sparepart)
+            db.session.commit()
+            return make_response(sparepart.to_dict(),200)
+        return make_response({"msg":"Sparepart entered does not exist"},404)
 api.add_resource(Sparepart_by_id,'/sparepart/<int:id>')
 
 if __name__=="__main__":
