@@ -508,6 +508,34 @@ class Car_image_by_id(Resource):
         return make_response({"msg":"No image found"})
     
 api.add_resource(Car_image_by_id,'/carimg/<int:id>')
+
+class Get_sparepart_images(Resource):
+    def get(self):
+        images=SpareImage.query.all()
+        if images:
+            return make_response([image.to_dict() for image in images],200)
+        return make_response({"msg":"No sparepart images found"},404)
+    
+    def post(self):
+        files=request.files.getlist('images')
+        sparepart_id=request.form.get('sparepart_id')
+        sparepart=Sparepart.query.get(sparepart_id)
+        if not sparepart:
+            return make_response({"msg":"No such sparepart exists"},404)
+        if not files or len(files)==0:
+            return make_response({"msg":"No image provided"},400)
+        uploaded_images=[]
+        for file in files:
+            if not allowed_file(file.filename):
+                return make_response({"msg":"Invalid file format entered"},400)
+            upload_result=cloudinary.uploader.upload(file)
+            image_url=upload_result.get('secure_url')
+            new_image=SpareImage(image_url=image_url,sparepart_id=sparepart.id)
+            db.session.add(new_image)
+            uploaded_images.append(new_image)
+        db.session.commit()
+        return make_response([img.to_dict() for img in uploaded_images],201)
+api.add_resource(Get_sparepart_images,'/sparepartImages')
             
 
 if __name__=="__main__":
