@@ -1,4 +1,4 @@
-from models import db,User,Mechanic,Garage,Car,Review,Service,Sparepart
+from models import db,User,Mechanic,Garage,Car,Review,Service,Sparepart,CarImage,SpareImage
 from flask_migrate import Migrate
 from flask import Flask, request, make_response,jsonify
 from flask_restful import Api, Resource
@@ -8,6 +8,9 @@ from datetime import timedelta
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash,generate_password_hash
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASE = os.environ.get(
@@ -33,6 +36,12 @@ migrate = Migrate(app, db)
 db.init_app(app)
 api=Api(app)
 jwt=JWTManager(app)
+
+cloudinary.config(
+    cloud_name="dia2le5vz",
+    api_key="716219668214133",
+    api_secret="12Wn1cP9Wc_cZb6gFWMe2tdvHWQ"
+)
 
 
 class Home(Resource):
@@ -425,14 +434,27 @@ class Sparepart_by_id(Resource):
         return make_response({"msg":"Sparepart entered does not exist"})        
 api.add_resource(Sparepart_by_id,'/sparepart/<int:id>')
 
-class Get_reviews(Resource):
-    def get(self):
-        reviews=Review.query.all()
-        if reviews:
-            return make_response([review.to_dict() for review in reviews],200)
-        return make_response({"msg":"No reviews at this time"},404)
+# class Get_reviews(Resource):
+#     def get(self):
+#         reviews=Review.query.all()
+#         if reviews:
+#             return make_response([review.to_dict() for review in reviews],200)
+#         return make_response({"msg":"No reviews at this time"},404)
     
-api.add_resource(Get_reviews,'/reviews')
+#     def post(self):
+#         data=request.get_json()
+        
+    
+# api.add_resource(Get_reviews,'/reviews')
+
+class Get_car_images(Resource):
+    def get(self):
+        images=CarImage.query.all()
+        if images:
+            return make_response([image.to_dict() for image in images],200)
+        return make_response({"msg":"No images at this time"},404)
+    
+api.add_resource(Get_car_images,'/carimg')
 
 if __name__=="__main__":
     app.run(debug=True)
