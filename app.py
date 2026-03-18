@@ -499,6 +499,14 @@ class Car_image_by_id(Resource):
         db.session.commit()
         return make_response(image.to_dict(),200)
     
+    def delete(self,id):
+        image=CarImage.query.filter_by(id=id).first()
+        if image:
+            db.session.delete(image)
+            db.session.commit()
+            return make_response({"msg":"Image deleted successfully"},200)
+        return make_response({"msg":"No image found"})
+    
 api.add_resource(Car_image_by_id,'/carimg/<int:id>')
             
 
