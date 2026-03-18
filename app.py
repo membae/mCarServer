@@ -536,7 +536,36 @@ class Get_sparepart_images(Resource):
         db.session.commit()
         return make_response([img.to_dict() for img in uploaded_images],201)
 api.add_resource(Get_sparepart_images,'/sparepartImages')
-            
+
+class SpareImage_by_id(Resource):
+    def get(self,id):
+        image=SpareImage.query.filter_by(id=id).first()
+        if image:
+            return make_response(image.to_dict(),200)
+        return make_response({"msg":"Sparepart image entered does not exist"},404)
+    
+    def patch(self,id):
+        image=SpareImage.query.filter_by(id=id).first()
+        if not image:
+            return make_response({"msg":"No image found"},404)
+        file=request.files.get('images')
+        if not file:
+            return make_response({"msg":"No image provided"},400)
+        if not allowed_file(file.filename):
+            return make_response({"msg":"Invalid file format entered"},400)
+        upload_result=cloudinary.uploader.upload(file)
+        image.image_url=upload_result.get('secure_url')
+        db.session.commit()
+        return make_response(image.to_dict(),200)
+    
+    def delete(self,id):
+        image=SpareImage.query.filter_by(id=id).first()
+        if image:
+            db.session.delete(image)
+            db.session.commit()
+            return make_response({"msg":"Image deleted successfully"},200)
+        return make_response({"msg":"No image with entered id found"},404)
+api.add_resource(SpareImage_by_id,'/sparepartImages/<int:id>')            
 
 if __name__=="__main__":
     app.run(debug=True)
