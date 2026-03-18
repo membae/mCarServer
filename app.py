@@ -454,6 +454,28 @@ class Get_car_images(Resource):
             return make_response([image.to_dict() for image in images],200)
         return make_response({"msg":"No images at this time"},404)
     
+    def post(self):
+        files=request.files.getlist('images')
+        car_id=request.form.get('car_id')
+        car=Car.query.get(car_id)
+        if not car:
+            return make_response({"msg":"Car id entered does not exist"},404)
+        if not files or len(files)==0:
+            return make_response({"msg":"No image provided"},400)
+        uploaded_images=[]
+        for file in files:
+            if not allowed_file(file.filename):
+                return make_response({"msg":"Invalid file format"},400)
+            upload_result=cloudinary.uploader.upload(file)
+            image_url=upload_result.get('secure_url')
+            public_id=upload_result.get('public_id')
+            new_image=CarImage(image_url=image_url,car_id=car.id)
+            
+            db.session.add(new_image)
+            uploaded_images.append(new_image)
+        db.session.commit()
+        return make_response([img.to_dict() for img in uploaded_images],201)
+    
 api.add_resource(Get_car_images,'/carimg')
 
 if __name__=="__main__":
