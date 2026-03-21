@@ -46,7 +46,7 @@ class Mechanic(db.Model, SerializerMixin):
     garage=db.relationship('Garage',back_populates='mechanics')
     
     #serialize_rules=('-user.mechanic','-services.mechanic','-garage.mechanics')
-    serialize_only =('id','specialization','hourly_rate','rating')
+    serialize_only =('id','specialization','hourly_rate','rating','user.first_name','user.id','user.last_name','user.email','user.location','user.phone')
 class Service(db.Model, SerializerMixin):
     __tablename__='services'
     
